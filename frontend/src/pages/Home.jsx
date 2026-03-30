@@ -170,33 +170,17 @@ export default function Home() {
 
       {/* --- TAGS MARQUEE (Infinite Slide Animation) --- */}
       {tags.length > 0 && (
-        <section className="h-[300px] md:h-[400px] w-full overflow-hidden relative border-y bg-slate-50/50 dark:bg-black/20 flex items-center justify-center" style={{ borderColor: "var(--ghost-border)" }}>
+        <section className="h-[300px] md:h-[400px] w-full overflow-hidden relative border-y bg-slate-900 dark:bg-black/40 flex items-center justify-center" style={{ borderColor: "var(--ghost-border)" }}>
           
           <div className="absolute w-[200vw] md:w-[150vw] flex flex-col items-center justify-center origin-center shrink-0">
             
-            {/* Strip 1: Tilted Left (-4deg), Scrolling Left */}
-            <div className="flex w-[300vw] md:w-[200vw] rotate-[-4deg] bg-[#8b5cf6] py-5 shadow-2xl z-0 transform-gpu overflow-hidden border-y border-white/10 shrink-0">
-              <motion.div 
-                className="flex whitespace-nowrap gap-10 pr-10 pl-10 items-center shrink-0"
-                animate={{ x: ["0%", "-50%"] }} 
-                transition={{ duration: 160, ease: "linear", repeat: Infinity }}
-              >
-                {Array(15).fill(tags).flat().map((tag, i) => (
-                  <Link to={`/components?tags=${tag._id}`} key={i} className="flex items-center gap-10 text-white hover:text-pink-200 transition-colors">
-                    <span className="text-[16px] md:text-[20px] font-black uppercase tracking-[0.2em]">{tag.name}</span>
-                    <span className="text-white/40 text-sm">✦</span>
-                  </Link>
-                ))}
-              </motion.div>
-            </div>
-
             {/* Strip 2: Tilted Right (3deg), Scrolling Right */}
-            <div className="flex w-[300vw] md:w-[200vw] rotate-[3deg] py-5 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-10 -mt-16 md:-mt-10 transform-gpu overflow-hidden border-y shrink-0"
+            <div className="flex w-[300vw] md:w-[200vw] rotate-[3deg] py-5 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-8 -mt-16 md:-mt-10 transform-gpu overflow-hidden border-y shrink-0"
                  style={{ background: "var(--bg-elevated)", borderColor: "var(--ghost-border)" }}>
               <motion.div 
                 className="flex whitespace-nowrap gap-10 pr-10 pl-10 items-center shrink-0"
                 animate={{ x: ["-50%", "0%"] }} 
-                transition={{ duration: 140, ease: "linear", repeat: Infinity }}
+                transition={{ duration: 100, ease: "linear", repeat: Infinity }}
               >
                 {Array(15).fill(tags).flat().map((tag, i) => (
                   <Link to={`/components?tags=${tag._id}`} key={i} className="flex items-center gap-10 hover:scale-105 transition-transform"
@@ -207,6 +191,23 @@ export default function Home() {
                 ))}
               </motion.div>
             </div>
+
+            {/* Strip 1: Tilted Left (-4deg), Scrolling Left */}
+            <div className="flex w-[300vw] md:w-[200vw] rotate-[-4deg] bg-[#8b5cf6] py-5 shadow-2xl z-10 transform-gpu overflow-hidden border-y border-white/10 shrink-0">
+              <motion.div 
+                className="flex whitespace-nowrap gap-10 pr-10 pl-10 items-center shrink-0"
+                animate={{ x: ["0%", "-50%"] }} 
+                transition={{ duration: 90, ease: "linear", repeat: Infinity }}
+              >
+                {Array(15).fill(tags).flat().map((tag, i) => (
+                  <Link to={`/components?tags=${tag._id}`} key={i} className="flex items-center gap-10 text-white hover:text-pink-200 transition-colors">
+                    <span className="text-[16px] md:text-[20px] font-black uppercase tracking-[0.2em]">{tag.name}</span>
+                    <span className="text-white/40 text-sm">✦</span>
+                  </Link>
+                ))}
+              </motion.div>
+            </div>
+
             
           </div>
         </section>
