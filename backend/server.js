@@ -74,6 +74,11 @@ app.get("/api/health", (req, res) => {
   res.json({ success: true, message: "UI Library API is running ✅" });
 });
 
+// Root route
+app.get("/", (req, res) => {
+  res.send("Welcome to the UI Library API");
+});
+
 // ─── Error Handling ───────────────────────────────────────────────────────────
 app.use(notFound);
 app.use(errorHandler);
