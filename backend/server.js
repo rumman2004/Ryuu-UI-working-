@@ -43,8 +43,8 @@ app.use("/api", apiLimiter);
 
 // ─── Core Middleware ───────────────────────────────────────────────────────────
 const allowedOrigins = [
-  process.env.FRONTEND_URI || "http://localhost:5173",
-  process.env.ADMIN_URI || "http://localhost:5174",
+  process.env.FRONTEND_URI,
+  process.env.ADMIN_URI,
 ];
 
 app.use(cors({
