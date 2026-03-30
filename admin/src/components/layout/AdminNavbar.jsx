@@ -34,7 +34,7 @@ export default function AdminNavbar({ onMenuClick }) {
 
         <div>
           <h1 className="font-semibold text-slate-100 text-sm">{title}</h1>
-          <p className="text-xs text-slate-500">UIVault Admin Panel</p>
+          <p className="text-xs text-slate-500">Black UI Admin Panel</p>
         </div>
       </div>
 

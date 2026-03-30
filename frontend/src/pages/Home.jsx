@@ -129,7 +129,7 @@ export default function Home() {
               <div className="w-3 h-3 rounded-full bg-rose-400" />
               <div className="w-3 h-3 rounded-full bg-amber-400" />
               <div className="w-3 h-3 rounded-full bg-emerald-400" />
-              <span className="ml-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">component.jsx — UIVault</span>
+              <span className="ml-4 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">component.jsx — Black UI</span>
             </div>
             {/* Editor Syntax Body */}
             <div className="p-6 md:p-8 font-mono text-sm leading-8 overflow-hidden relative min-h-[440px]">
@@ -265,7 +265,7 @@ export default function Home() {
                </div>
                <div>
                  <h3 className="text-4xl md:text-5xl font-black text-[#8b5cf6] mb-3">100M+</h3>
-                 <p className="text-sm font-semibold leading-relaxed" style={{ color: "var(--text-secondary)" }}>Websites powered by <br/>UIVault code</p>
+                 <p className="text-sm font-semibold leading-relaxed" style={{ color: "var(--text-secondary)" }}>Websites powered by <br/>Black UI components</p>
                </div>
             </div>
             
@@ -298,7 +298,7 @@ export default function Home() {
 
           <div className="py-24 px-8 sm:pl-[240px] lg:pl-[380px] pr-8 lg:pr-20 text-center sm:text-left relative z-10">
             <h2 className="text-3xl lg:text-4xl xl:text-5xl font-black text-white leading-[1.2] mb-6">
-              Ready? Let's Start with UIVault and Get an <span className="text-pink-300">Awesome Experience</span>
+              Ready? Let's Start with Black UI and Get an <span className="text-pink-300">Awesome Experience</span>
             </h2>
             <p className="text-white/80 text-sm lg:text-base mb-8 max-w-xl font-medium leading-relaxed">
               Define the steps, rules, and actions that make up your custom web architecture. Copy absolutely any component immediately for free.

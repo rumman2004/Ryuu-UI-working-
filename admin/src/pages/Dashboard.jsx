@@ -99,7 +99,7 @@ export default function Dashboard() {
           Dashboard
         </h1>
         <p className="text-sm mt-1" style={{ color: "#adaaad" }}>
-          Welcome back, <span className="font-semibold" style={{ color: "#a3a6ff" }}>{admin?.username}</span> · Here's what's happening in UIVault
+          Welcome back, <span className="font-semibold" style={{ color: "#a3a6ff" }}>{admin?.username}</span> · Here's what's happening in Black UI
         </p>
       </motion.div>
 

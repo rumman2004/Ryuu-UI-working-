@@ -65,18 +65,26 @@ export default function Navbar() {
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 font-bold text-xl shrink-0 group">
           <motion.div
-            whileHover={{ rotate: 180, scale: 1.1 }}
+            whileHover={{ rotate: 90, scale: 1.1 }}
             transition={{ duration: 0.4 }}
-            className="w-9 h-9 rounded-xl flex items-center justify-center"
-            style={{
-              background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-              boxShadow: "0 0 20px rgba(99, 102, 241, 0.3)",
-            }}
+            className="w-9 h-9 flex items-center justify-center"
           >
-            <Layers size={17} className="text-white" />
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+              <defs>
+                <linearGradient id="blackui-nav" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#fed7aa" />
+                  <stop offset="30%" stopColor="#f472b6" />
+                  <stop offset="70%" stopColor="#a855f7" />
+                  <stop offset="100%" stopColor="#3b82f6" />
+                </linearGradient>
+              </defs>
+              <path d="M50 5 L89 27.5 L89 72.5 L50 95 L11 72.5 L11 27.5 Z" fill="url(#blackui-nav)" />
+              <path d="M48 50 L11 28 L11 72 Z" fill="var(--bg-primary)" opacity="0.8" />
+              <path d="M52 52 L89 72 L50 95 Z" fill="var(--bg-primary)" opacity="0.8" />
+            </svg>
           </motion.div>
           <span className="gradient-text font-extrabold tracking-tight">
-            UIVault
+            Black UI
           </span>
         </Link>
 

@@ -17,7 +17,7 @@ export default function Footer() {
             >
               <Layers size={16} className="text-white" />
             </div>
-            <span className="gradient-text font-extrabold">UIVault</span>
+            <span className="gradient-text font-extrabold">Black UI</span>
           </Link>
           <p className="text-sm leading-relaxed max-w-xs" style={{ color: "var(--text-secondary)" }}>
             A free, open-source collection of beautiful UI components for React
@@ -96,7 +96,7 @@ export default function Footer() {
         className="py-5 text-center text-xs flex items-center justify-center gap-1.5"
         style={{ color: "#767577", borderTop: "1px solid var(--ghost-border)" }}
       >
-        <span>© {new Date().getFullYear()} UIVault — Built with</span>
+        <span>© {new Date().getFullYear()} Black UI — Built with</span>
         <Heart size={12} className="text-rose-500 fill-rose-500" />
         <span>by Rumman Ahmed</span>
       </div>

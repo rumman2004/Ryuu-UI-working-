@@ -107,7 +107,7 @@ export default function Login() {
               <Layers size={26} className="text-white" />
             </div>
             <div className="text-center">
-              <span className="font-extrabold text-2xl gradient-text block">UIVault</span>
+              <span className="font-extrabold text-2xl gradient-text block">Black UI</span>
               <span className="text-xs font-medium" style={{ color: "#767577" }}>ADMIN PANEL</span>
             </div>
           </div>
@@ -194,7 +194,7 @@ export default function Login() {
 
         {/* Footer */}
         <p className="text-center text-xs mt-6" style={{ color: "#767577" }}>
-          © {new Date().getFullYear()} UIVault · Designed for the void
+          © {new Date().getFullYear()} Black UI · Designed for the void
         </p>
       </motion.div>
     </div>
