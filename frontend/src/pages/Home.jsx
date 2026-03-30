@@ -179,7 +179,7 @@ export default function Home() {
               <motion.div 
                 className="flex whitespace-nowrap gap-10 pr-10 pl-10 items-center shrink-0"
                 animate={{ x: ["0%", "-50%"] }} 
-                transition={{ duration: 40, ease: "linear", repeat: Infinity }}
+                transition={{ duration: 160, ease: "linear", repeat: Infinity }}
               >
                 {Array(15).fill(tags).flat().map((tag, i) => (
                   <Link to={`/components?tags=${tag._id}`} key={i} className="flex items-center gap-10 text-white hover:text-pink-200 transition-colors">
@@ -196,7 +196,7 @@ export default function Home() {
               <motion.div 
                 className="flex whitespace-nowrap gap-10 pr-10 pl-10 items-center shrink-0"
                 animate={{ x: ["-50%", "0%"] }} 
-                transition={{ duration: 35, ease: "linear", repeat: Infinity }}
+                transition={{ duration: 140, ease: "linear", repeat: Infinity }}
               >
                 {Array(15).fill(tags).flat().map((tag, i) => (
                   <Link to={`/components?tags=${tag._id}`} key={i} className="flex items-center gap-10 hover:scale-105 transition-transform"
