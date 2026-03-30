@@ -13,12 +13,12 @@ const navItems = [
   { to: "/tags",       label: "Tags",       icon: Tag },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ onClose }) {
   const { admin, logout } = useAdminAuth();
 
   return (
     <aside
-      className="w-64 min-h-screen flex flex-col shrink-0"
+      className="w-64 h-full flex flex-col shrink-0"
       style={{
         background: "#0e0e10",
         borderRight: "1px solid rgba(255,255,255,0.05)",
@@ -48,6 +48,7 @@ export default function Sidebar() {
             key={to}
             to={to}
             end={end}
+            onClick={onClose}
             className={({ isActive }) =>
               `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group ${
                 isActive

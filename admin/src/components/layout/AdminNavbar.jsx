@@ -26,7 +26,7 @@ export default function AdminNavbar({ onMenuClick }) {
       <div className="flex items-center gap-4">
         <button
           onClick={onMenuClick}
-          className="w-8 h-8 rounded-lg border flex items-center justify-center hover:border-indigo-500 transition-all"
+          className="lg:hidden w-8 h-8 rounded-lg border flex items-center justify-center hover:border-indigo-500 transition-all"
           style={{ borderColor: "#1e2535" }}
         >
           <Menu size={16} className="text-slate-400" />
