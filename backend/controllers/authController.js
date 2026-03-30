@@ -10,6 +10,13 @@ const generateToken = require("../utils/generateToken");
 const registerAdmin = asyncHandler(async (req, res) => {
   const { username, email, password, role } = req.body;
 
+  // Protect registration by only allowing it if no admins exist
+  const adminCount = await Admin.countDocuments();
+  if (adminCount > 0) {
+    res.status(403);
+    throw new Error("Registration is completely disabled. Create additional admins manually or contact the superadmin.");
+  }
+
   const adminExists = await Admin.findOne({ email });
   if (adminExists) {
     res.status(400);
