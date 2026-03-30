@@ -42,20 +42,12 @@ app.use("/api", apiLimiter);
 // Mongoose's schema casting natively protects against most object-injection attacks.
 
 // ─── Core Middleware ───────────────────────────────────────────────────────────
-const allowedOrigins = [
-  process.env.FRONTEND_URI,
-  process.env.ADMIN_URI,
-];
-
+// Universal CORS allowing any frontend domain to connect.
+// We return 'true' for the origin to reflect the exact requester domain,
+// which acts like a wildcard '*' but also allows cookies/credentials to pass.
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      const msg = "The CORS policy for this site does not allow access from the specified Origin.";
-      return callback(new Error(msg), false);
-    }
+    return callback(null, true); // Always allow
   },
   credentials: true,
 }));
