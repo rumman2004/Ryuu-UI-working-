@@ -1,562 +1,350 @@
 // frontend/src/pages/Home.jsx
-
-import { useEffect, useState }          from "react";
-import { Link }                         from "react-router-dom";
-import { motion }                       from "framer-motion";
-import {
-  ArrowRight, Zap, Star, ChevronRight,
-  Puzzle, FolderOpen, Code2, Sparkles,
-  Globe, Box, LayoutGrid, MessageSquare,
-  BarChart3, Compass, Hexagon, Circle,
-  Braces, Triangle, Diamond,
-} from "lucide-react";
-import { getComponents, getCategories, getTags } from "../services/api";
-import ComponentCard                    from "../components/ui/ComponentCard";
-import SkeletonCard                     from "../components/shared/SkeletonCard";
-import { AuroraBackground, StarField, WaveBackground } from "../components/background";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ArrowRight, Star, CheckCircle2, Copy, LayoutGrid } from "lucide-react";
 
 const fadeUp = {
-  hidden:  { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 30 },
   visible: (i = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, delay: i * 0.12, ease: "easeOut" },
+    opacity: 1, y: 0, transition: { duration: 0.6, delay: i * 0.12, ease: "easeOut" }
   }),
 };
 
-const catIcons = {
-  "Must-have":   Star,
-  "Layout":      LayoutGrid,
-  "Advanced":    Zap,
-  "Feedback":    MessageSquare,
-  "Data":        BarChart3,
-  "Navigation":  Compass,
-};
-
-const statsBase = [
-  { value: "37+", label: "Components", icon: Puzzle,     color: "#a3a6ff" },
-  { value: "0",   label: "Categories", icon: FolderOpen, color: "#ac8aff" },
-  { value: "2",   label: "Frameworks", icon: Code2,      color: "#67e8f9" },
-  { value: "100%",label: "Free & Open", icon: Sparkles,  color: "#34d399" },
-];
-
-/* ── Floating Geometric Shapes Component ── */
-function FloatingShapes() {
-  const shapes = [
-    { Icon: Hexagon,  x: "12%",  y: "18%", size: 28, delay: 0,   dur: 12, color: "#6366f1" },
-    { Icon: Circle,   x: "85%",  y: "25%", size: 16, delay: 2,   dur: 10, color: "#8b5cf6" },
-    { Icon: Braces,   x: "78%",  y: "65%", size: 22, delay: 4,   dur: 14, color: "#06b6d4" },
-    { Icon: Triangle, x: "8%",   y: "72%", size: 18, delay: 1,   dur: 11, color: "#6366f1" },
-    { Icon: Diamond,  x: "92%",  y: "45%", size: 14, delay: 3,   dur: 13, color: "#8b5cf6" },
-    { Icon: Hexagon,  x: "45%",  y: "85%", size: 20, delay: 5,   dur: 15, color: "#06b6d4" },
-    { Icon: Code2,    x: "25%",  y: "40%", size: 16, delay: 6,   dur: 9,  color: "#6366f1" },
-    { Icon: Box,      x: "68%",  y: "12%", size: 18, delay: 2.5, dur: 11, color: "#8b5cf6" },
-  ];
-  return (
-    <>
-      {shapes.map(({ Icon, x, y, size, delay, dur, color }, i) => (
-        <motion.div
-          key={i}
-          animate={{
-            y: [-8, 8, -8],
-            rotate: [0, 10, -10, 0],
-            opacity: [0.03, 0.06, 0.03],
-          }}
-          transition={{ duration: dur, repeat: Infinity, ease: "easeInOut", delay }}
-          className="absolute pointer-events-none"
-          style={{ left: x, top: y }}
-        >
-          <Icon size={size} style={{ color }} strokeWidth={1} />
-        </motion.div>
-      ))}
-    </>
-  );
-}
-
-/* ── Mesh Gradient Lines ── */
-function MeshLines() {
-  return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.03]" viewBox="0 0 1200 800" preserveAspectRatio="none">
-      <motion.path
-        d="M240,120 Q500,300 960,180"
-        fill="none" stroke="#6366f1" strokeWidth="1"
-        animate={{ d: ["M240,120 Q500,300 960,180", "M240,160 Q500,250 960,220", "M240,120 Q500,300 960,180"] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.path
-        d="M180,500 Q600,350 1000,600"
-        fill="none" stroke="#8b5cf6" strokeWidth="1"
-        animate={{ d: ["M180,500 Q600,350 1000,600", "M180,460 Q600,400 1000,560", "M180,500 Q600,350 1000,600"] }}
-        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-      />
-      <motion.path
-        d="M350,200 Q700,500 1100,350"
-        fill="none" stroke="#06b6d4" strokeWidth="0.5"
-        animate={{ d: ["M350,200 Q700,500 1100,350", "M350,250 Q700,450 1100,300", "M350,200 Q700,500 1100,350"] }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 6 }}
-      />
-    </svg>
-  );
-}
-
 export default function Home() {
-  const [featured,      setFeatured]      = useState([]);
-  const [categories,    setCategories]    = useState([]);
-  const [tags,          setTags]          = useState([]);
-  const [loading,       setLoading]       = useState(true);
-  const [categoryCount, setCategoryCount] = useState(0);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [compRes, catRes, tagRes] = await Promise.all([
-          getComponents({ sort: "-copyCount", limit: 6 }),
-          getCategories(),
-          getTags(),
-        ]);
-        setFeatured(compRes?.data?.data   ?? []);
-        const categoryList = catRes?.data?.data  ?? [];
-        setCategories(categoryList);
-        setCategoryCount(categoryList.length);
-        setTags(tagRes?.data?.data ?? []);
-      } catch (err) {
-        console.error("Home fetch error:", err);
-        setFeatured([]);
-        setCategories([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, []);
-
-  const stats = statsBase.map((stat) =>
-    stat.label === "Categories"
-      ? { ...stat, value: `${categoryCount}` }
-      : stat
-  );
-
   return (
-    <div className="overflow-x-hidden">
+    <div className="overflow-x-hidden relative min-h-screen text-slate-800 dark:text-slate-200" style={{ background: "var(--bg-primary)" }}>
+      
+      {/* --- Mutmiz Background Blobs --- */}
+      <div 
+        className="absolute top-0 right-0 w-[90%] md:w-[60%] h-[800px] rounded-bl-[200px] -z-10 transition-colors duration-500" 
+        style={{ background: "linear-gradient(135deg, rgba(139, 92, 246, 0.12) 0%, rgba(99, 102, 241, 0.05) 100%)" }}
+      />
+      <div 
+        className="absolute top-[40%] left-[-10%] w-[400px] h-[400px] rounded-full -z-10 transition-colors duration-500 blur-[100px] opacity-40" 
+        style={{ background: "rgba(236, 72, 153, 0.3)" }}
+      />
 
-      {/* ══════════════════════════════════════════════
-           HERO – Cosmic Animated Background
-           (Inspired by Stitch "Digital Obsidian" design)
-         ══════════════════════════════════════════════ */}
-      <section className="relative min-h-[92vh] flex items-center justify-center px-4 py-24">
-
-        {/* ── Animated Background Layer ── */}
-        <div className="absolute inset-0 -z-10 overflow-hidden">
-          {/* Aurora gradient orbs */}
-          <AuroraBackground contained />
-
-          {/* Twinkling starfield with shooting stars */}
-          <StarField starCount={150} shootingStars />
-
-          {/* Dot grid overlay */}
-          <div className="absolute inset-0 dot-grid opacity-40" />
-
-          {/* Mesh gradient lines */}
-          <MeshLines />
-
-          {/* Floating geometric shapes */}
-          <FloatingShapes />
-        </div>
-
-        {/* ── Hero Content ── */}
-        <div className="max-w-4xl mx-auto text-center relative">
-
-          {/* Badge */}
+      {/* --- HERO SECTION --- */}
+      <section className="max-w-7xl mx-auto px-4 pt-20 pb-24 lg:pt-32 lg:pb-40 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative">
+        {/* Left: Text Content */}
+        <div className="relative z-10 lg:pr-10">
           <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
-            <motion.span
-              whileHover={{ scale: 1.05 }}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold mb-8 cursor-default"
-              style={{
-                background: "rgba(99, 102, 241, 0.08)",
-                border: "1px solid rgba(99, 102, 241, 0.2)",
-                color: "#a3a6ff",
-                backdropFilter: "blur(8px)",
-              }}
-            >
-              <Zap size={12} className="text-indigo-400" />
-              Open-Source UI Library — Tailwind CSS Components
-            </motion.span>
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-wider mb-6"
+                  style={{ background: "rgba(139, 92, 246, 0.1)", color: "#8b5cf6" }}>
+              <Star size={12} className="fill-current" /> Trustpilot 4.9 ★
+            </span>
           </motion.div>
-
-          {/* Heading */}
-          <motion.h1
+          
+          <motion.h1 
             initial="hidden" animate="visible" variants={fadeUp} custom={1}
-            className="text-5xl md:text-7xl font-black mb-6 leading-[1.08] tracking-tight"
+            className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-[1.08] tracking-tight"
+            style={{ color: "var(--text-primary)" }}
           >
-            <span style={{ color: "var(--text-primary)" }}>Discover Beautiful</span>
-            <br />
-            <span className="gradient-text-hero">UI Components</span>
+            Maximize Your <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-500">
+              Productivity
+            </span>
           </motion.h1>
-
-          {/* Subtitle */}
-          <motion.p
+          
+          <motion.p 
             initial="hidden" animate="visible" variants={fadeUp} custom={2}
-            className="text-base md:text-lg mb-10 max-w-2xl mx-auto leading-relaxed"
+            className="text-base md:text-lg mb-8 max-w-md font-medium"
             style={{ color: "var(--text-secondary)" }}
           >
-            Browse, preview, and copy production-ready React & HTML components.
-            Built for modern web developers with pixel-perfect design and animations.
+            Conquer your projects and take control with our high-quality UI Component Library.
           </motion.p>
-
-          {/* CTA Buttons */}
-          <motion.div
-            initial="hidden" animate="visible" variants={fadeUp} custom={3}
-            className="flex flex-wrap items-center justify-center gap-4"
-          >
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
-              <Link
-                to="/components"
-                className="glow-button inline-flex items-center gap-2 px-8 py-4 text-sm font-semibold rounded-2xl"
-              >
-                <span className="flex items-center gap-2">
-                  Explore Components
-                  <ArrowRight size={16} />
-                </span>
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
-              <Link
-                to="/favorites"
-                className="ghost-button inline-flex items-center gap-2 px-8 py-4 text-sm font-semibold rounded-2xl"
-              >
-                <Star size={15} className="text-amber-400 fill-amber-400" />
-                View Favorites
-              </Link>
-            </motion.div>
-          </motion.div>
-
-          {/* Stats Row */}
-          <motion.div
-            initial="hidden" animate="visible" variants={fadeUp} custom={5}
-            className="flex flex-wrap justify-center gap-4 mt-16 pt-10"
-            style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
-          >
-            {stats.map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.9 + i * 0.1, duration: 0.5 }}
-                whileHover={{ y: -4, scale: 1.05 }}
-                className="flex flex-col items-center gap-2 px-6 py-4 rounded-2xl cursor-default"
-                style={{
-                  background: "rgba(255,255,255,0.02)",
-                  border: "1px solid rgba(255,255,255,0.06)",
-                  backdropFilter: "blur(8px)",
-                }}
-              >
-                <div
-                  className="w-11 h-11 rounded-xl flex items-center justify-center"
-                  style={{ background: `${stat.color}15` }}
-                >
-                  <stat.icon size={20} style={{ color: stat.color }} strokeWidth={2} />
-                </div>
-                <span className="text-2xl font-black" style={{ color: stat.color }}>
-                  {stat.value}
-                </span>
-                <span className="text-[11px] font-medium" style={{ color: "var(--text-muted)" }}>
-                  {stat.label}
-                </span>
-              </motion.div>
-            ))}
-          </motion.div>
-
-        </div>
-      </section>
-
-      {/* ── Categories ── */}
-      <section className="max-w-7xl mx-auto px-4 py-20">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-12"
-        >
-          <span className="text-xs font-semibold uppercase tracking-widest mb-3 block" style={{ color: "#a3a6ff" }}>
-            Explore
-          </span>
-          <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: "var(--text-primary)" }}>
-            Browse by Category
-          </h2>
-          <p className="text-sm max-w-md mx-auto" style={{ color: "var(--text-secondary)" }}>
-            Find exactly what you need, organized by purpose and function
-          </p>
-        </motion.div>
-
-        {categories.length === 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-            {Array(3).fill(0).map((_, i) => (
-              <div key={i} className="h-36 rounded-2xl animate-pulse" style={{ background: "var(--bg-card-solid)", border: "1px solid var(--ghost-border)" }} />
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-            {categories.map((cat, i) => {
-              const CatIcon = catIcons[cat.name] ?? Puzzle;
-              return (
-                <motion.div
-                  key={cat._id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.08, duration: 0.4 }}
-                  whileHover={{ y: -6 }}
-                >
-                  <Link
-                    to={`/components?category=${cat._id}`}
-                    className="group block p-6 rounded-2xl transition-all relative overflow-hidden"
-                    style={{
-                      background: "var(--surface-glass)",
-                      border: "1px solid var(--ghost-border)",
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.borderColor = "rgba(99,102,241,0.3)";
-                      e.currentTarget.style.boxShadow = "0 8px 32px rgba(99,102,241,0.08)";
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.borderColor = "var(--ghost-border)";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
-                  >
-                    {/* Glow */}
-                    <div className="absolute -top-8 -right-8 w-28 h-28 rounded-full opacity-0 group-hover:opacity-20 transition-opacity" style={{ background: "radial-gradient(circle, #6366f1, transparent)" }} />
-
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                      style={{ background: "rgba(99,102,241,0.1)" }}
-                    >
-                      <CatIcon size={22} style={{ color: "#a3a6ff" }} strokeWidth={2} />
-                    </div>
-
-                    <h3 className="font-bold text-lg mb-1 group-hover:text-indigo-400 transition-colors" style={{ color: "var(--text-primary)" }}>
-                      {cat.name}
-                    </h3>
-
-                    <div className="flex items-center justify-between mt-4">
-                      <span
-                        className="text-xs font-semibold px-3 py-1.5 rounded-xl"
-                        style={{ background: "rgba(99,102,241,0.12)", color: "#a3a6ff" }}
-                      >
-                        {cat.componentCount ?? 0} components
-                      </span>
-                      <ArrowRight
-                        size={16}
-                        className="text-indigo-400 opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all"
-                      />
-                    </div>
-                  </Link>
-                </motion.div>
-              );
-            })}
-          </div>
-        )}
-      </section>
-
-      {/* ── Tags ── */}
-      {tags.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 py-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-center mb-12"
-          >
-            <span className="text-xs font-semibold uppercase tracking-widest mb-3 block" style={{ color: "#ac8aff" }}>
-              Discover
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: "var(--text-primary)" }}>
-              Browse By Tags
-            </h2>
-            <p className="text-sm max-w-md mx-auto" style={{ color: "var(--text-secondary)" }}>
-              Explore components grouped by use case, style, and functionality
-            </p>
-          </motion.div>
-
-          <div className="flex flex-wrap justify-center gap-3">
-            {tags.slice(0, 20).map((tag, i) => (
-              <motion.div
-                key={tag._id}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.04, duration: 0.3 }}
-                whileHover={{ scale: 1.08 }}
-              >
-                <Link
-                  to={`/components?tags=${tag._id}`}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all"
-                  style={{
-                    background: "var(--surface-glass)",
-                    color: "var(--text-primary)",
-                    border: "1px solid var(--ghost-border)",
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = "rgba(99,102,241,0.4)";
-                    e.currentTarget.style.color = "var(--color-accent-light, #a3a6ff)";
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = "var(--ghost-border)";
-                    e.currentTarget.style.color = "var(--text-primary)";
-                  }}
-                >
-                  {tag.name}
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* ── Featured Components ── */}
-      <section className="py-20 relative" style={{ background: "var(--bg-secondary)" }}>
-        <WaveBackground contained position="top" />
-        <div className="max-w-7xl mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="flex items-center justify-between mb-12"
-          >
-            <div>
-              <span className="text-xs font-semibold uppercase tracking-widest mb-2 block" style={{ color: "#a3a6ff" }}>
-                Handpicked
-              </span>
-              <h2 className="text-3xl md:text-4xl font-bold mb-1" style={{ color: "var(--text-primary)" }}>
-                Featured Components
-              </h2>
-              <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                Our most popular and highest quality components
-              </p>
-            </div>
-            <Link
-              to="/components"
-              className="hidden md:flex items-center gap-2 text-sm font-semibold text-indigo-400 hover:text-indigo-300 transition-colors group"
-            >
-              View all
-              <ArrowRight size={15} className="group-hover:translate-x-1 transition-transform" />
+          
+          <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={3}>
+            <Link to="/components" className="btn-gradient px-8 py-3.5 rounded-full shadow-lg shadow-indigo-500/25 inline-flex items-center gap-2 text-sm">
+              Learn More <ArrowRight size={16} />
             </Link>
           </motion.div>
 
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array(6).fill(0).map((_, i) => <SkeletonCard key={i} />)}
-            </div>
-          ) : featured.length === 0 ? (
-            <div className="text-center py-20 rounded-2xl" style={{ background: "var(--surface-glass)", border: "1px solid var(--ghost-border)" }}>
-              <Puzzle size={40} className="mx-auto mb-4 text-indigo-500 opacity-30" />
-              <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-                No components yet — add some from the admin panel
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featured.map((comp, i) => (
-                <ComponentCard key={comp._id} component={comp} index={i} />
+          {/* Social Proof Overlaps */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+            className="mt-16 flex items-center gap-4 border-t pt-8"
+            style={{ borderColor: "var(--ghost-border)" }}
+          >
+            <div className="flex -space-x-3">
+              {[1,2,3,4].map(i => (
+                <img key={i} src={`https://i.pravatar.cc/100?img=${i+10}`} alt="User" className="w-10 h-10 rounded-full border-2 border-[var(--bg-primary)] shadow-sm" />
               ))}
             </div>
-          )}
+            <div className="text-sm">
+              <p className="font-bold" style={{ color: "var(--text-primary)" }}>Downloaded more than</p>
+              <p className="font-medium" style={{ color: "var(--text-secondary)" }}>5M+ in a year 🚀</p>
+            </div>
+          </motion.div>
+        </div>
 
-          <div className="mt-8 text-center md:hidden">
-            <Link
-              to="/components"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-indigo-400"
+        {/* Right: Mockup Interface */}
+        <div className="relative z-10 lg:h-[600px] flex justify-center lg:justify-end items-center mt-10 lg:mt-0">
+          <motion.div 
+            initial={{ opacity: 0, x: 50, scale: 0.9 }} animate={{ opacity: 1, x: 0, scale: 1 }} transition={{ duration: 0.8, ease: "easeOut" }}
+            className="relative w-full max-w-[340px] rounded-[2.5rem] shadow-2xl overflow-hidden glass-card border-[6px]"
+            style={{ 
+              borderColor: "var(--bg-highest)", 
+              height: "600px",
+              boxShadow: "0 25px 60px -12px rgba(99, 102, 241, 0.25)"
+            }}
+          >
+            {/* App Header */}
+            <div className="px-6 pt-10 pb-6 rounded-b-[2rem]" style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)" }}>
+              <p className="text-white/80 text-sm font-medium">Hello,</p>
+              <p className="text-white font-black text-2xl mb-6">UIVault Dev 👋</p>
+              
+              <div className="bg-white/20 backdrop-blur-md rounded-2xl p-5 text-white shadow-inner">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="font-bold text-sm">Brand New UI</span>
+                  <span className="text-xs font-bold text-indigo-600 bg-white px-3 py-1 rounded-full">Pro</span>
+                </div>
+                <div className="w-full bg-black/20 h-1.5 rounded-full mt-4">
+                  <div className="bg-white w-[70%] h-full rounded-full" />
+                </div>
+                <p className="text-[10px] font-bold mt-2 text-white/90 uppercase tracking-wider">70% Copied</p>
+              </div>
+            </div>
+
+            {/* App Body */}
+            <div className="p-6 space-y-4" style={{ background: "var(--bg-card-solid)", minHeight: "350px" }}>
+              <p className="font-black text-sm uppercase tracking-widest text-[#6366f1] mb-2">Recent Components</p>
+              {[
+                { name: "Navbar Layout", count: "120+", color: "#6366f1" },
+                { name: "Hero Format", count: "95+", color: "#ec4899" },
+                { name: "Pricing Cards", count: "42+", color: "#10b981" }
+              ].map((item, i) => (
+                <div key={i} className="flex items-center gap-4 p-3 rounded-2xl border transition-colors hover:bg-[var(--surface-glass)]" style={{ borderColor: "var(--ghost-border)" }}>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center opacity-20" style={{ background: item.color }} />
+                  <div className="flex-1">
+                    <p className="font-bold text-xs" style={{ color: "var(--text-primary)" }}>{item.name}</p>
+                    <p className="text-[10px] font-medium mt-0.5" style={{ color: "var(--text-secondary)" }}>Updated today</p>
+                  </div>
+                  <span className="text-[10px] font-black" style={{ color: item.color }}>{item.count}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Floating UI Badges */}
+          <motion.div animate={{ y: [-10, 10, -10] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-20 right-[-10px] md:right-0 glass-card p-4 rounded-2xl shadow-xl flex items-center gap-3 z-20"
+            style={{ background: "var(--bg-elevated)", border: "1px solid var(--ghost-border)" }}>
+            <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
+              <CheckCircle2 size={16} className="text-emerald-500" />
+            </div>
+            <div>
+              <p className="font-bold text-xs" style={{ color: "var(--text-primary)" }}>Project Overview</p>
+              <p className="text-[10px] font-medium" style={{ color: "var(--text-secondary)" }}>Code sync completed</p>
+            </div>
+          </motion.div>
+
+        </div>
+      </section>
+
+      {/* --- FEATURE ZIGZAG 1 --- */}
+      <section className="relative px-4 py-20 lg:py-32 overflow-hidden">
+        {/* Rounded Purple BG shape on the left */}
+        <div className="absolute top-0 left-[-10%] w-[500px] h-[500px] rounded-[4rem] -z-10 rotate-12 transition-colors duration-500 opacity-50"
+             style={{ background: "linear-gradient(135deg, rgba(236,72,153,0.05), rgba(139,92,246,0.1))" }} />
+             
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+          
+          {/* Left: Floating Element Mockup */}
+          <div className="relative">
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
+              className="glass-card rounded-[2rem] p-8 max-w-sm mx-auto xl:ml-10 shadow-2xl border relative z-10"
+              style={{ background: "var(--bg-highest)", borderColor: "var(--ghost-border)" }}
             >
-              View all components <ArrowRight size={14} />
+              <div className="flex justify-between items-center mb-6 border-b pb-4" style={{ borderColor: "var(--ghost-border)" }}>
+                <span className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>Task List</span>
+                <span className="text-[10px] font-bold px-3 py-1.5 bg-indigo-500/10 text-indigo-500 rounded-lg uppercase tracking-wider">+ Add task</span>
+              </div>
+              <div className="space-y-4">
+                {[
+                  "Create React Grid Guide",
+                  "Design Glassmorphism Navbar",
+                  "Release Sidebar Update"
+                ].map((task, i) => (
+                  <div key={i} className="flex items-center gap-4 p-4 rounded-xl border" style={{ borderColor: "var(--ghost-border)" }}>
+                    <div className="w-5 h-5 rounded border-2 border-slate-300 dark:border-slate-500 flex-shrink-0" />
+                    <p className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>{task}</p>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+             {/* Small accent floating box */}
+             <motion.div animate={{ y: [10, -10, 10] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+               className="absolute -bottom-10 left-10 md:left-24 glass-card p-4 rounded-xl shadow-lg border z-20"
+               style={{ background: "var(--bg-elevated)", borderColor: "var(--ghost-border)" }}>
+               <div className="flex items-end gap-1.5 h-8">
+                 {[40, 70, 45, 90, 60, 100].map((h,i) => (
+                   <div key={i} className="w-2 rounded-t-sm" style={{ height: `${h}%`, background: i%2===0 ? '#ec4899' : '#6366f1' }} />
+                 ))}
+               </div>
+             </motion.div>
+          </div>
+
+          {/* Right: Text & Stats */}
+          <div className="lg:pl-10">
+            <div className="grid grid-cols-2 gap-8 mb-12 border-b pb-12" style={{ borderColor: "var(--ghost-border)" }}>
+               <div>
+                 <h3 className="text-4xl md:text-5xl font-black text-[#6366f1] mb-3">29M+</h3>
+                 <p className="text-sm font-semibold leading-relaxed" style={{ color: "var(--text-secondary)" }}>Installed over the <br/>time</p>
+               </div>
+               <div>
+                 <h3 className="text-4xl md:text-5xl font-black text-[#8b5cf6] mb-3">100M+</h3>
+                 <p className="text-sm font-semibold leading-relaxed" style={{ color: "var(--text-secondary)" }}>Total tasks overall <br/>completed</p>
+               </div>
+            </div>
+            
+            <div className="space-y-8">
+              <div>
+                <h4 className="font-bold text-lg mb-2" style={{ color: "var(--text-primary)" }}>Data Sync and Backup</h4>
+                <p className="text-sm font-medium leading-relaxed" style={{ color: "var(--text-secondary)" }}>Used tools and app settings are synced across multiple devices effortlessly.</p>
+              </div>
+              <div>
+                <h4 className="font-bold text-lg mb-2" style={{ color: "var(--text-primary)" }}>Task Attachments</h4>
+                <p className="text-sm font-medium leading-relaxed" style={{ color: "var(--text-secondary)" }}>Users can attach files, documents, or links to tasks, providing contextual assets instantly.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- FEATURE ZIGZAG 2 --- */}
+      <section className="relative px-4 py-20 lg:py-32" style={{ background: "var(--bg-secondary)" }}>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+          
+          {/* Left: Text */}
+          <div className="lg:pr-10">
+            <h2 className="text-4xl lg:text-5xl font-black mb-10 leading-[1.15]" style={{ color: "var(--text-primary)" }}>
+              Comprehensive <span className="text-[#8b5cf6]">Feature Set</span> of a Task Manager App
+            </h2>
+            
+            <div className="space-y-8">
+              <div className="flex gap-5">
+                <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center shrink-0">
+                  <Copy className="text-indigo-500" size={20} />
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg mb-2" style={{ color: "var(--text-primary)" }}>Data Sync and Backup</h4>
+                  <p className="text-sm font-medium leading-relaxed" style={{ color: "var(--text-secondary)" }}>Used tools and app settings sync simultaneously across multiple devices.</p>
+                </div>
+              </div>
+              <div className="flex gap-5">
+                <div className="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center shrink-0">
+                  <LayoutGrid className="text-purple-500" size={20} />
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg mb-2" style={{ color: "var(--text-primary)" }}>Task Attachments</h4>
+                  <p className="text-sm font-medium leading-relaxed" style={{ color: "var(--text-secondary)" }}>Users can attach files, documents, or links to tasks, providing conditional context instantly.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Floating Cards Mockup */}
+          <div className="relative h-[450px] flex justify-center items-center">
+            {/* Background Blob behind cards */}
+            <div className="absolute w-[80%] h-[80%] rounded-full bg-indigo-500/5 blur-3xl" />
+            
+            {/* Card 1 */}
+            <motion.div animate={{ y: [-5, 5, -5] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute top-5 left-0 lg:-left-10 w-full max-w-sm p-6 rounded-3xl glass-card shadow-lg z-10"
+              style={{ background: "var(--bg-highest)" }}>
+              <div className="flex justify-between mb-4">
+                <div className="flex gap-3 items-center">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500"><LayoutGrid size={16}/></div>
+                  <div><p className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>Create Task</p><p className="text-[10px]" style={{ color: "var(--text-secondary)" }}>12 August 2024</p></div>
+                </div>
+                <div className="flex gap-3 items-center">
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-500"><LayoutGrid size={16}/></div>
+                  <div><p className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>App Design</p><p className="text-[10px]" style={{ color: "var(--text-secondary)" }}>15 mins left</p></div>
+                </div>
+              </div>
+              <div className="border-t pt-4" style={{ borderColor: "var(--ghost-border)" }}>
+                 <p className="font-bold text-sm mb-1" style={{ color: "var(--text-primary)" }}>Project Overview</p>
+                 <p className="text-xs font-medium leading-relaxed" style={{ color: "var(--text-secondary)" }}>Design process will be completely automated using these specific interfaces and visual structures.</p>
+              </div>
+            </motion.div>
+
+            {/* Card 2 */}
+            <motion.div animate={{ x: [5, -5, 5] }} transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute bottom-5 right-0 lg:-right-10 p-5 rounded-2xl glass-card shadow-xl flex items-center gap-5 z-20"
+              style={{ background: "var(--bg-elevated)", borderColor: "var(--ghost-border)" }}>
+              <div className="text-right">
+                <p className="text-xs font-bold uppercase tracking-wider mb-1" style={{ color: "var(--text-secondary)" }}>Total Working Hours</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-2xl font-black text-[#6366f1]">24:52:00</p>
+                  <span className="text-[10px] font-bold bg-[#ec4899] text-white px-2 py-0.5 rounded-md">Pro</span>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+          
+        </div>
+      </section>
+
+      {/* --- CTA BANNER --- */}
+      <section className="px-4 py-20 lg:py-32 max-w-7xl mx-auto">
+        <div className="relative rounded-[3rem] overflow-hidden" style={{ background: "linear-gradient(135deg, #8b5cf6, #6366f1)" }}>
+          {/* Overlapping Mockup (Fake Phone Half) */}
+          <div className="absolute -left-10 lg:left-10 bottom-[-80px] w-[240px] lg:w-[280px] h-[120%] pt-10 px-5 rounded-t-[3rem] bg-white dark:bg-[#1a1a1f] border-8 border-b-0 border-white/20 shadow-2xl hidden sm:block rotate-[-5deg]">
+            <div className="w-16 h-1.5 mx-auto bg-slate-300 dark:bg-slate-700 rounded-full mb-8" />
+            <div className="space-y-4">
+              <div className="flex gap-3 mb-6 items-center">
+                 <div className="w-8 h-8 rounded-full bg-indigo-500/20" />
+                 <div className="h-4 bg-indigo-500/20 rounded-md w-24" />
+              </div>
+              <div className="h-12 bg-slate-100 dark:bg-slate-800 rounded-2xl" />
+              <div className="h-32 bg-indigo-500/10 rounded-2xl" />
+              <div className="h-12 bg-slate-100 dark:bg-slate-800 rounded-2xl w-3/4" />
+              <div className="h-12 bg-indigo-500 rounded-2xl mt-8" />
+            </div>
+          </div>
+
+          <div className="py-24 px-8 sm:pl-[240px] lg:pl-[380px] pr-8 lg:pr-20 text-center sm:text-left relative z-10">
+            <h2 className="text-3xl lg:text-4xl xl:text-5xl font-black text-white leading-[1.2] mb-6">
+              Ready? Let's Start with Mutmiz and Get <span className="text-pink-300">Awesome Experience</span>
+            </h2>
+            <p className="text-white/80 text-sm lg:text-base mb-8 max-w-xl font-medium leading-relaxed">
+              Come straight to user flow block to easily sketch the steps, rules and actions that make up your custom workflow. Copy any component immediately.
+            </p>
+            <Link to="/components" className="inline-block bg-white text-[#8b5cf6] font-extrabold px-10 py-4 rounded-full text-sm hover:shadow-2xl hover:scale-105 transition-all">
+              Learn More →
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ── FAQ ── */}
-      <section className="max-w-4xl mx-auto px-4 py-20">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-12"
-        >
-          <h2 className="text-3xl font-bold mb-3" style={{ color: "var(--text-primary)" }}>
-            Frequently Asked Questions
-          </h2>
-          <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-            Everything you need to know about UIVault
-          </p>
-        </motion.div>
-
-        <div className="space-y-4">
-          {[
-            { q: "Is UIVault free to use?", a: "Yes! UIVault is completely free to use. You can explore and copy component code and use them in your projects without any restrictions." },
-            { q: "Do I need Tailwind CSS installed?", a: "Yes, UIVault components are built with Tailwind CSS. Check the official Tailwind CSS Documentation for detailed installation instructions." },
-            { q: "Are components mobile-responsive?", a: "UIVault components are designed with responsiveness in mind, ensuring they look great on all screen sizes from mobile to desktop." },
-            { q: "Can I use these with Next.js, React or Vue?", a: "Yes! UIVault components are compatible with Next.js, React, Vue.js and even static HTML. Simply copy and paste into your project." },
-          ].map((item, i) => (
-            <motion.details
-              key={i}
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-              className="group p-6 rounded-2xl cursor-pointer"
-              style={{
-                background: "var(--surface-glass)",
-                border: "1px solid var(--ghost-border)",
-              }}
-            >
-              <summary className="flex items-center justify-between text-base font-semibold select-none" style={{ color: "var(--text-primary)" }}>
-                {item.q}
-                <ChevronRight size={16} className="group-open:rotate-90 transition-transform text-indigo-400" />
-              </summary>
-              <p className="mt-4 text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                {item.a}
-              </p>
-            </motion.details>
-          ))}
+      {/* --- TESTIMONIAL --- */}
+      <section className="px-4 pb-32 max-w-5xl mx-auto flex flex-col md:flex-row items-center gap-16 relative">
+        <div className="relative md:w-1/3 flex justify-center">
+           {/* Avatar Stack */}
+           <div className="relative">
+             <div className="w-32 h-32 rounded-[2rem] bg-pink-500 overflow-hidden shadow-2xl relative z-10 border-4 border-[var(--bg-primary)]">
+               <img src="https://i.pravatar.cc/300?img=12" className="w-full h-full object-cover" alt="User" />
+             </div>
+             {/* Trustpilot overlay */}
+             <div className="absolute -top-4 -right-16 glass-card px-4 py-2 rounded-xl border z-20 flex flex-col items-center" style={{ background: "var(--bg-elevated)", borderColor: "var(--ghost-border)" }}>
+                <span className="text-[#10b981] font-bold text-xs flex items-center gap-1"><Star size={10} className="fill-current"/> Trustpilot</span>
+                <span className="text-xl font-black" style={{ color: "var(--text-primary)" }}>4.9 ★</span>
+             </div>
+           </div>
         </div>
-      </section>
-
-      {/* ── CTA Banner ── */}
-      <section className="max-w-5xl mx-auto px-4 py-20">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="relative rounded-3xl p-12 text-center overflow-hidden"
-          style={{ background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 40%, #6366f1 100%)" }}
-        >
-          {/* Dot grid */}
-          <div className="absolute inset-0 dot-grid opacity-20" />
-          {/* Glow */}
-          <div className="absolute -top-20 -right-20 w-60 h-60 bg-white/10 rounded-full blur-[60px]" />
-
-          <div className="relative">
-            <Sparkles size={32} className="mx-auto mb-4 text-white/80" />
-            <h2 className="text-3xl md:text-4xl font-black text-white mb-4">
-              Start building today
-            </h2>
-            <p className="text-white/75 mb-8 max-w-md mx-auto text-sm">
-              Hundreds of free, copy-paste components. No signup required.
-            </p>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.97 }}>
-              <Link
-                to="/components"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white text-indigo-600 rounded-2xl font-bold hover:bg-indigo-50 transition-all shadow-xl text-sm"
-              >
-                Browse Components
-                <ArrowRight size={16} />
-              </Link>
-            </motion.div>
+        <div className="md:w-2/3 text-center md:text-left">
+          <div className="mb-4 text-[#a3a6ff]"> {/* Quotes icon */}
+             <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h4v10h-10z"/></svg>
           </div>
-        </motion.div>
+          <h3 className="text-xl md:text-2xl font-bold mb-8 leading-relaxed" style={{ color: "var(--text-primary)" }}>
+            "We had an excellent experience working with UIVault. Their library delivered a visually stunning and user-friendly design that exceeded our expectations totally."
+          </h3>
+          <p className="font-bold text-sm" style={{ color: "var(--text-primary)" }}>Alan Walker, Senior Executive</p>
+          <span className="text-xs font-semibold uppercase tracking-wider mt-1 block" style={{ color: "var(--text-secondary)" }}>The Ford</span>
+        </div>
       </section>
 
     </div>
