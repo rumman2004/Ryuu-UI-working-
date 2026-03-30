@@ -1,7 +1,7 @@
 // frontend/src/components/layout/Footer.jsx
 
 import { Link }    from "react-router-dom";
-import { Layers, Github, Twitter, Heart } from "lucide-react";
+import { Layers, Github, Twitter, Heart, Instagram, Linkedin } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -34,8 +34,10 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-3 mt-5">
             {[
-              { icon: Github,  href: "#" },
-              { icon: Twitter, href: "#" },
+              { icon: Github,  href: "https://github.com/rumman2004/Ryuu-UI-working-" },
+              { icon: Twitter, href: "https://x.com/rumman_tw11" },
+              { icon: Instagram, href: "https://www.instagram.com/rumman.ig" },
+              { icon: Linkedin, href: "https://www.linkedin.com/in/rummanahmed04" },
             ].map(({ icon: Icon, href }, idx) => (
               <a
                 key={idx}
