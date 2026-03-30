@@ -97,14 +97,20 @@ export default function Login() {
         >
           {/* Logo */}
           <div className="flex flex-col items-center gap-3 mb-8">
-            <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center"
-              style={{
-                background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                boxShadow: "0 0 30px rgba(99,102,241,0.3)",
-              }}
-            >
-              <Layers size={26} className="text-white" />
+            <div className="w-14 h-14 flex items-center justify-center">
+              <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+                <defs>
+                  <linearGradient id="blackui-login" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#fed7aa" />
+                    <stop offset="30%" stopColor="#f472b6" />
+                    <stop offset="70%" stopColor="#a855f7" />
+                    <stop offset="100%" stopColor="#3b82f6" />
+                  </linearGradient>
+                </defs>
+                <path d="M50 5 L89 27.5 L89 72.5 L50 95 L11 72.5 L11 27.5 Z" fill="url(#blackui-login)" />
+                <path d="M48 50 L11 28 L11 72 Z" fill="#0e0e10" opacity="0.8" />
+                <path d="M52 52 L89 72 L50 95 Z" fill="#0e0e10" opacity="0.8" />
+              </svg>
             </div>
             <div className="text-center">
               <span className="font-extrabold text-2xl gradient-text block">Black UI</span>
@@ -135,7 +141,7 @@ export default function Login() {
                   autoComplete="email"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
-                  placeholder="admin@uivault.io"
+                  placeholder="admin@blackui.io"
                   className="input-admin w-full pl-10 pr-4 py-3 text-sm"
                 />
               </div>
