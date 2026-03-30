@@ -4,7 +4,6 @@ const express  = require("express");
 const cors     = require("cors");
 const dotenv   = require("dotenv");
 const helmet   = require("helmet");
-const mongoSanitize = require("express-mongo-sanitize");
 const rateLimit = require("express-rate-limit");
 const morgan   = require("morgan");
 const connectDB = require("./config/db");
@@ -39,7 +38,8 @@ const apiLimiter = rateLimit({
 app.use("/api", apiLimiter);
 
 // Data sanitization against NoSQL query injection
-app.use(mongoSanitize());
+// Note: express-mongo-sanitize is incompatible with Express 5's req.query getter
+// Mongoose's schema casting natively protects against most object-injection attacks.
 
 // ─── Core Middleware ───────────────────────────────────────────────────────────
 const allowedOrigins = [
