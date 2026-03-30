@@ -97,7 +97,7 @@ export default function Navbar() {
           </div>
         </form>
 
-        <div className="flex-1 hidden md:block" />
+        <div className="flex-1" />
 
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-1">
@@ -108,7 +108,7 @@ export default function Navbar() {
                 whileTap={{ scale: 0.95 }}
                 className="relative px-4 py-2 rounded-xl text-sm font-medium transition-all"
                 style={{
-                  color: isActive(link.to) ? "#a3a6ff" : "#adaaad",
+                  color: isActive(link.to) ? "#a3a6ff" : (isDark ? "#adaaad" : "#4b5563"),
                   background: isActive(link.to) ? "rgba(99, 102, 241, 0.1)" : "transparent",
                   border: isActive(link.to)
                     ? "1px solid rgba(99, 102, 241, 0.2)"
@@ -178,8 +178,8 @@ export default function Navbar() {
               transition={{ duration: 0.15 }}
             >
               {menuOpen
-                ? <X    size={16} className="text-[#f9f5f8]" />
-                : <Menu size={16} className="text-[#f9f5f8]" />
+                ? <X    size={16} color={isDark ? "#f9f5f8" : "#111827"} />
+                : <Menu size={16} color={isDark ? "#f9f5f8" : "#111827"} />
               }
             </motion.div>
           </AnimatePresence>
@@ -197,8 +197,8 @@ export default function Navbar() {
             transition={{ duration: 0.25, ease: "easeInOut" }}
             className="overflow-hidden md:hidden"
             style={{
-              background: "rgba(14, 14, 16, 0.95)",
-              borderTop: "1px solid rgba(255,255,255,0.05)",
+              background: isDark ? "rgba(14, 14, 16, 0.95)" : "rgba(255, 255, 255, 0.95)",
+              borderTop: isDark ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(0,0,0,0.05)",
             }}
           >
             <div className="px-4 py-4 space-y-2">
@@ -220,7 +220,7 @@ export default function Navbar() {
                   to={link.to}
                   className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all"
                   style={{
-                    color: isActive(link.to) ? "#a3a6ff" : "#adaaad",
+                    color: isActive(link.to) ? "#a3a6ff" : (isDark ? "#adaaad" : "#4b5563"),
                     background: isActive(link.to) ? "rgba(99,102,241,0.08)" : "transparent",
                   }}
                 >
