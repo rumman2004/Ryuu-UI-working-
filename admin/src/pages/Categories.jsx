@@ -56,7 +56,7 @@ export default function Categories() {
   };
 
   return (
-    <div className="p-8 max-w-3xl">
+    <div className="w-full max-w-3xl">
       <h1 className="text-2xl font-bold text-slate-100 mb-6">Categories</h1>
 
       {/* Form */}
@@ -97,7 +97,7 @@ export default function Categories() {
           className="w-full px-4 py-2.5 rounded-xl border text-sm outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500 transition-all"
           style={{ backgroundColor: "#0f1320", borderColor: "#2f3b5a", color: "#e2e8f0" }}
         />
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <button
             type="submit"
             disabled={submitting}

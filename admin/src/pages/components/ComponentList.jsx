@@ -34,8 +34,8 @@ export default function ComponentList() {
   );
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="w-full">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-slate-100">Components</h1>
         <Link
           to="/components/add"
@@ -64,8 +64,8 @@ export default function ComponentList() {
           <div className="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
         </div>
       ) : (
-        <div className="rounded-2xl border overflow-hidden" style={{ borderColor: "#1e2535" }}>
-          <table className="w-full text-sm">
+        <div className="rounded-2xl border overflow-x-auto w-full" style={{ borderColor: "#1e2535" }}>
+          <table className="w-full text-sm min-w-max">
             <thead style={{ backgroundColor: "#0d1117" }}>
               <tr>
                 <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Name</th>

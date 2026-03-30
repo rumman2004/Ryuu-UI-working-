@@ -142,7 +142,7 @@ export default function AddComponent({ isEdit }) {
   );
 
   return (
-    <div className="p-8 max-w-4xl">
+    <div className="w-full max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex items-center gap-4 mb-8">
         <button
@@ -259,7 +259,7 @@ export default function AddComponent({ isEdit }) {
           className="rounded-2xl border overflow-hidden"
           style={{ backgroundColor: "#111827", borderColor: "#1e2535" }}
         >
-          <div className="flex border-b" style={{ borderColor: "#1e2535" }}>
+          <div className="flex overflow-x-auto whitespace-nowrap scrollbar-hide border-b" style={{ borderColor: "#1e2535" }}>
             {["react", "html", "css", "js"].map((tab) => (
               <button
                 key={tab}
@@ -295,7 +295,7 @@ export default function AddComponent({ isEdit }) {
         </div>
 
         {/* Publish + Submit */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pt-2">
           <label className="flex items-center gap-3 cursor-pointer select-none">
             <div
               className={`relative w-11 h-6 rounded-full transition-colors ${

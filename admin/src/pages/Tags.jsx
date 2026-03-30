@@ -44,7 +44,7 @@ export default function Tags() {
   };
 
   return (
-    <div className="p-8 max-w-2xl">
+    <div className="w-full max-w-2xl">
       <h1 className="text-2xl font-bold text-slate-100 mb-6">Tags</h1>
 
       <form
@@ -54,7 +54,7 @@ export default function Tags() {
         <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">
           Add Tag
         </h2>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
           <input
             id="tag-name"
             name="name"
