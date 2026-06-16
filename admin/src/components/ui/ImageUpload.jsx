@@ -4,15 +4,20 @@ import { useState, useRef }  from "react";
 import { motion }            from "framer-motion";
 import { Upload, X, Image }  from "lucide-react";
 
+/**
+ * value    — a preview URL to show (existing Cloudinary URL in edit mode, or a
+ *            local object URL after a fresh pick).
+ * onChange — called with (file, previewUrl). `file` is the raw File to upload
+ *            (null when cleared); `previewUrl` is what to display.
+ */
 export default function ImageUpload({ value, onChange }) {
   const [dragging, setDragging] = useState(false);
   const inputRef               = useRef(null);
 
   const handleFile = (file) => {
     if (!file || !file.type.startsWith("image/")) return;
-    const reader = new FileReader();
-    reader.onload = (e) => onChange(e.target.result);
-    reader.readAsDataURL(file);
+    const previewUrl = URL.createObjectURL(file);
+    onChange(file, previewUrl);
   };
 
   const handleDrop = (e) => {
@@ -27,7 +32,8 @@ export default function ImageUpload({ value, onChange }) {
         <div className="relative rounded-xl overflow-hidden border group" style={{ borderColor: "#1e2535" }}>
           <img src={value} alt="Preview" className="w-full h-48 object-cover" />
           <button
-            onClick={() => onChange("")}
+            type="button"
+            onClick={() => onChange(null, "")}
             className="absolute top-2 right-2 w-7 h-7 rounded-lg bg-rose-500 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-600"
           >
             <X size={13} />

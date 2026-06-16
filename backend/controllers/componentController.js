@@ -93,6 +93,12 @@ const getComponentById = asyncHandler(async (req, res) => {
   res.json({ success: true, data: component });
 });
 
+// Multipart/form-data sends everything as strings. Booleans arrive as "true"/"false"
+// (and "false" is truthy!), and repeated fields arrive as a string (one value),
+// an array (many), or undefined (none). These helpers normalize that.
+const toBool = (v) => v === true || v === "true";
+const toArray = (v) => (Array.isArray(v) ? v : v == null || v === "" ? [] : [v]);
+
 // @desc    Create component
 // @route   POST /api/components
 // @access  Private (Admin)
@@ -126,10 +132,10 @@ const createComponent = asyncHandler(async (req, res) => {
     name,
     description,
     category,
-    tags:         tags             || [],
+    tags:         toArray(tags),
     codeVariants: normalizedVariants,
-    isFeatured:   isFeatured       || false,
-    isPublished:  isPublished      || false,
+    isFeatured:   toBool(isFeatured),
+    isPublished:  toBool(isPublished),
   };
 
   // If image was uploaded via Cloudinary middleware
@@ -174,6 +180,11 @@ const updateComponent = asyncHandler(async (req, res) => {
   if (typeof updateData.codeVariants === "string") {
     updateData.codeVariants = JSON.parse(updateData.codeVariants);
   }
+
+  // Normalize multipart string values.
+  if ("isPublished" in updateData) updateData.isPublished = toBool(updateData.isPublished);
+  if ("isFeatured"  in updateData) updateData.isFeatured  = toBool(updateData.isFeatured);
+  if ("tags" in updateData)        updateData.tags        = toArray(updateData.tags);
 
   if ((!Array.isArray(updateData.codeVariants) || updateData.codeVariants.length === 0) && updateData.code) {
     updateData.codeVariants = [];

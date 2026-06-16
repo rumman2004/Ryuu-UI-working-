@@ -5,59 +5,124 @@ import { oneDark, oneLight }           from "react-syntax-highlighter/dist/esm/s
 import { useTheme }                    from "../../context/ThemeContext";
 import CopyButton                      from "./CopyButton";
 
+const LANG_META = {
+  react:      { label: "React",      dot: "#61DAFB", tag: "JSX" },
+  html:       { label: "HTML",       dot: "#E34C26", tag: "HTML5" },
+  css:        { label: "CSS",        dot: "#264DE4", tag: "Styles" },
+  javascript: { label: "JavaScript", dot: "#F7DF1E", tag: "ES2024" },
+};
+
+const LANG_MAP = { react: "jsx", html: "html", css: "css", javascript: "javascript" };
+
 export default function CodeBlock({ code, language = "jsx", componentId }) {
   const { isDark } = useTheme();
+  const meta = LANG_META[language] ?? { label: language.toUpperCase(), dot: "#6366f1", tag: "" };
+  const syntaxLang = LANG_MAP[language] ?? language;
 
-  const langMap = { react: "jsx", html: "html", css: "css", javascript: "javascript" };
-  const syntaxLang = langMap[language] ?? language;
+  const darkStyle = {
+    ...oneDark,
+    'pre[class*="language-"]': {
+      ...oneDark['pre[class*="language-"]'],
+      background: "#0a0a0b",
+      margin: 0,
+      padding: "20px 24px",
+      fontSize: "0.8rem",
+      fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
+      lineHeight: "1.75",
+      maxHeight: "460px",
+      overflow: "auto",
+    },
+    'code[class*="language-"]': {
+      ...oneDark['code[class*="language-"]'],
+      background: "transparent",
+      fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
+    },
+  };
 
-  const langLabel = {
-    react:      "React · JSX",
-    html:       "HTML",
-    css:        "CSS",
-    javascript: "JavaScript",
-  }[language] ?? language.toUpperCase();
+  const lightStyleOverride = {
+    ...oneLight,
+    'pre[class*="language-"]': {
+      ...oneLight['pre[class*="language-"]'],
+      background: "#fafafa",
+      margin: 0,
+      padding: "20px 24px",
+      fontSize: "0.8rem",
+      fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
+      lineHeight: "1.75",
+      maxHeight: "460px",
+      overflow: "auto",
+    },
+  };
 
   return (
     <div
-      className="rounded-2xl overflow-hidden border"
-      style={{ borderColor: "var(--border-color)" }}
+      className="overflow-hidden"
+      style={{
+        background: isDark ? "#0a0a0b" : "#fafafa",
+        border: "1px solid var(--border-soft)",
+        borderRadius: "16px",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+      }}
     >
-      {/* Top Bar */}
+      {/* ── Header ── */}
       <div
-        className="flex items-center justify-between px-4 py-2.5 border-b"
-        style={{ backgroundColor: isDark ? "#0d1424" : "#f1f5f9" }}
+        className="flex items-center justify-between px-5 py-3"
+        style={{
+          background: isDark ? "#111114" : "#f1f0ed",
+          borderBottom: "1px solid var(--border-subtle)",
+        }}
       >
-        {/* Traffic lights */}
         <div className="flex items-center gap-3">
-          <div className="flex gap-1.5">
-            <div className="w-3 h-3 rounded-full bg-rose-500/70" />
-            <div className="w-3 h-3 rounded-full bg-amber-500/70" />
-            <div className="w-3 h-3 rounded-full bg-green-500/70" />
+          {/* Traffic lights */}
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full" style={{ background: "#FF5F57" }} />
+            <div className="w-2.5 h-2.5 rounded-full" style={{ background: "#FEBC2E" }} />
+            <div className="w-2.5 h-2.5 rounded-full" style={{ background: "#28C840" }} />
           </div>
-          <span
-            className="text-xs font-medium"
-            style={{ color: "var(--text-secondary)" }}
-          >
-            {langLabel}
-          </span>
+
+          {/* Language pill */}
+          <div className="flex items-center gap-2 px-2.5 py-1"
+            style={{
+              background: "var(--bg-elevated)",
+              border: "1px solid var(--border-subtle)",
+              borderRadius: "7px",
+            }}>
+            <span className="w-2 h-2 rounded-full shrink-0" style={{ background: meta.dot }} />
+            <span className="text-[11px] font-semibold" style={{ color: "var(--text-secondary)" }}>
+              {meta.label}
+            </span>
+            {meta.tag && (
+              <>
+                <span style={{ color: "var(--border-medium)" }}>·</span>
+                <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>{meta.tag}</span>
+              </>
+            )}
+          </div>
         </div>
+
         <CopyButton code={code} componentId={componentId} />
       </div>
 
-      {/* Code */}
+      {/* ── Code ── */}
       <SyntaxHighlighter
         language={syntaxLang}
-        style={isDark ? oneDark : oneLight}
+        style={isDark ? darkStyle : lightStyleOverride}
         customStyle={{
-          margin:     0,
-          padding:    "1.25rem",
-          fontSize:   "0.8rem",
-          maxHeight:  "450px",
-          overflow:   "auto",
-          background: isDark ? "#0d1424" : "#ffffff",
+          margin: 0,
+          padding: "20px 24px",
+          fontSize: "0.8rem",
+          maxHeight: "460px",
+          overflow: "auto",
+          background: isDark ? "#0a0a0b" : "#fafafa",
+          fontFamily: "'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace",
         }}
         showLineNumbers
+        lineNumberStyle={{
+          color: isDark ? "#3a3836" : "#c0bdb8",
+          paddingRight: "20px",
+          userSelect: "none",
+          fontFamily: "'JetBrains Mono', monospace",
+        }}
         wrapLongLines
       >
         {code}

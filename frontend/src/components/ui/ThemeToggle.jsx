@@ -1,4 +1,4 @@
-// frontend/src/components/layout/ThemeToggle.jsx
+// frontend/src/components/ui/ThemeToggle.jsx
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Sun, Moon }               from "lucide-react";
@@ -9,23 +9,49 @@ export default function ThemeToggle() {
 
   return (
     <motion.button
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.9 }}
+      whileHover={{ scale: 1.08 }}
+      whileTap={{ scale: 0.92 }}
       onClick={toggleTheme}
-      className="w-9 h-9 rounded-xl border flex items-center justify-center transition-all hover:border-indigo-500 hover:bg-indigo-500/10"
-      style={{ backgroundColor: "var(--bg-secondary)" }}
+      className="relative w-9 h-9 flex items-center justify-center overflow-hidden"
+      style={{
+        background: "var(--bg-elevated)",
+        border: "1px solid var(--border-medium)",
+        borderRadius: "11px",
+        transition: "border-color 0.25s ease, background 0.25s ease",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = "var(--gold-border)";
+        e.currentTarget.style.background = "var(--gold-muted)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = "var(--border-medium)";
+        e.currentTarget.style.background = "var(--bg-elevated)";
+      }}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
     >
+      {/* Ambient glow behind icon */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: isDark
+            ? "radial-gradient(circle at center, rgba(99,102,241,0.08), transparent 70%)"
+            : "radial-gradient(circle at center, rgba(99,102,241,0.08), transparent 70%)",
+          transition: "background 0.4s ease",
+        }}
+      />
+
       <AnimatePresence mode="wait">
         <motion.div
           key={isDark ? "sun" : "moon"}
-          initial={{ rotate: -90, opacity: 0, scale: 0.5 }}
-          animate={{ rotate: 0,   opacity: 1, scale: 1   }}
-          exit={{   rotate:  90,  opacity: 0, scale: 0.5 }}
-          transition={{ duration: 0.2 }}
+          initial={{ rotate: isDark ? -60 : 60, opacity: 0, scale: 0.5 }}
+          animate={{ rotate: 0, opacity: 1, scale: 1 }}
+          exit={{ rotate: isDark ? 60 : -60, opacity: 0, scale: 0.5 }}
+          transition={{ duration: 0.25, ease: [0.34, 1.56, 0.64, 1] }}
+          className="relative z-10"
         >
           {isDark
-            ? <Sun  size={16} className="text-amber-400" />
-            : <Moon size={16} className="text-indigo-500" />
+            ? <Sun  size={15} style={{ color: "var(--gold)" }} />
+            : <Moon size={15} style={{ color: "#818CF8" }} />
           }
         </motion.div>
       </AnimatePresence>

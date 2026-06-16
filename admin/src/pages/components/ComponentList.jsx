@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link }                from "react-router-dom";
 import { motion }              from "framer-motion";
 import { Plus, Pencil, Trash2, Search } from "lucide-react";
-import { getComponents, deleteComponent } from "../../services/adminApi";
+import { getComponents, deleteComponent, togglePublish } from "../../services/adminApi";
 import toast from "react-hot-toast";
 
 export default function ComponentList() {
@@ -27,6 +27,24 @@ export default function ComponentList() {
       toast.success("Deleted");
       fetchComponents();
     } catch { toast.error("Failed to delete"); }
+  };
+
+  const handleTogglePublish = async (comp) => {
+    // Optimistic flip, reconcile with the server response.
+    setComponents((prev) =>
+      prev.map((c) => (c._id === comp._id ? { ...c, isPublished: !c.isPublished } : c))
+    );
+    try {
+      const res = await togglePublish(comp._id);
+      const isPublished = res.data?.data?.isPublished;
+      setComponents((prev) =>
+        prev.map((c) => (c._id === comp._id ? { ...c, isPublished } : c))
+      );
+      toast.success(isPublished ? "Published" : "Moved to draft");
+    } catch {
+      toast.error("Failed to update status");
+      fetchComponents(); // revert to server truth
+    }
   };
 
   const filtered = components.filter((c) =>
@@ -91,15 +109,18 @@ export default function ComponentList() {
                     {(comp.codeVariants ?? []).map((v) => v.language).join(", ") || "none"}
                   </td>
                   <td className="px-5 py-3.5">
-                    <span
-                      className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                    <button
+                      type="button"
+                      onClick={() => handleTogglePublish(comp)}
+                      title="Click to toggle published / draft"
+                      className={`px-2 py-0.5 rounded-full text-xs font-medium transition-colors cursor-pointer ${
                         comp.isPublished
-                          ? "bg-emerald-500/15 text-emerald-400"
-                          : "bg-slate-500/15 text-slate-400"
+                          ? "bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25"
+                          : "bg-slate-500/15 text-slate-400 hover:bg-slate-500/25"
                       }`}
                     >
                       {comp.isPublished ? "Published" : "Draft"}
-                    </span>
+                    </button>
                   </td>
                   <td className="px-5 py-3.5">
                     <div className="flex items-center justify-end gap-2">

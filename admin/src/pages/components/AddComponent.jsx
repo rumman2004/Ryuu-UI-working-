@@ -7,6 +7,7 @@ import {
   createComponent, updateComponent, getComponentById,
   getCategories, getTags,
 } from "../../services/adminApi";
+import ImageUpload from "../../components/ui/ImageUpload";
 import toast from "react-hot-toast";
 
 const EMPTY = {
@@ -20,6 +21,8 @@ export default function AddComponent({ isEdit }) {
   const { id }       = useParams();
   const navigate     = useNavigate();
   const [form,       setForm]       = useState(EMPTY);
+  const [imageFile,  setImageFile]  = useState(null);   // freshly picked File to upload
+  const [imagePreview, setImagePreview] = useState(""); // URL to display (existing or local)
   const [categories, setCategories] = useState([]);
   const [allTags,    setAllTags]    = useState([]);
   const [loading,    setLoading]    = useState(isEdit);
@@ -65,6 +68,7 @@ export default function AddComponent({ isEdit }) {
             code:        codeFromVariants,
             isPublished: comp.isPublished ?? false,
           });
+          setImagePreview(comp.previewImage ?? "");
         })
         .catch(() => toast.error("Failed to load component"))
         .finally(() => setLoading(false));
@@ -83,6 +87,7 @@ export default function AddComponent({ isEdit }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name.trim()) { toast.error("Name is required"); return; }
+    if (!form.category)    { toast.error("Please select a category"); return; }
 
     const codeVariants = [];
     if (form.code.react.trim()) {
@@ -107,18 +112,24 @@ export default function AddComponent({ isEdit }) {
       return;
     }
 
-    const payload = {
-      ...form,
-      codeVariants,
-    };
+    // Multipart payload so the previewImage File reaches Multer→Cloudinary.
+    const fd = new FormData();
+    fd.append("name", form.name);
+    if (form.slug)        fd.append("slug", form.slug);
+    fd.append("description", form.description || "");
+    fd.append("category", form.category);
+    form.tags.forEach((t) => fd.append("tags", t));
+    fd.append("codeVariants", JSON.stringify(codeVariants));
+    fd.append("isPublished", form.isPublished ? "true" : "false");
+    if (imageFile) fd.append("previewImage", imageFile);
 
     try {
       setSubmitting(true);
       if (isEdit) {
-        await updateComponent(id, payload);
+        await updateComponent(id, fd);
         toast.success("Component updated!");
       } else {
-        await createComponent(payload);
+        await createComponent(fd);
         toast.success("Component created!");
       }
       navigate("/components");
@@ -222,6 +233,23 @@ export default function AddComponent({ isEdit }) {
               ))}
             </select>
           </div>
+        </div>
+
+        {/* Preview Image */}
+        <div
+          className="rounded-2xl border p-6"
+          style={{ backgroundColor: "#111827", borderColor: "#1e2535" }}
+        >
+          <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">
+            Preview Image
+          </h2>
+          <ImageUpload
+            value={imagePreview}
+            onChange={(file, preview) => { setImageFile(file); setImagePreview(preview); }}
+          />
+          <p className="text-xs text-slate-600 mt-3">
+            Shown on component cards. Optional, but recommended.
+          </p>
         </div>
 
         {/* Tags */}

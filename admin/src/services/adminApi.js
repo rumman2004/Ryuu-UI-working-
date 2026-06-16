@@ -36,9 +36,14 @@ export const getMe = () => adminApi.get("/auth/me");
 // Components
 export const getComponents = (params) => adminApi.get("/components/admin/all", { params });
 export const getComponentById = (id) => adminApi.get(`/components/admin/${id}`);
-export const createComponent = (data) => adminApi.post("/components", data);
-export const updateComponent = (id, data) => adminApi.put(`/components/${id}`, data);
+// createComponent/updateComponent accept FormData (for image upload). We must NOT force
+// Content-Type: application/json here — axios sets the correct multipart boundary itself.
+export const createComponent = (data) =>
+  adminApi.post("/components", data, { headers: { "Content-Type": undefined } });
+export const updateComponent = (id, data) =>
+  adminApi.put(`/components/${id}`, data, { headers: { "Content-Type": undefined } });
 export const deleteComponent = (id) => adminApi.delete(`/components/${id}`);
+export const togglePublish = (id) => adminApi.patch(`/components/${id}/publish`);
 
 // Categories
 export const getCategories = () => adminApi.get("/categories");
@@ -51,8 +56,5 @@ export const getTags   = () => adminApi.get("/tags");
 export const createTag = (data) => adminApi.post("/tags", data);
 export const updateTag = (id, data) => adminApi.put(`/tags/${id}`, data);
 export const deleteTag = (id) => adminApi.delete(`/tags/${id}`);
-
-// Stats
-export const getStats = () => adminApi.get("/stats");
 
 export default adminApi;

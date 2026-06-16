@@ -4,22 +4,27 @@ import { useState, useEffect }            from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useFavorites }                   from "../../context/FavoritesContext";
 import { motion, AnimatePresence }        from "framer-motion";
-import {
-  Layers, Search, Heart, Menu, X, Grid, Sun, Moon
-} from "lucide-react";
+import { Search, Heart, Menu, X }        from "lucide-react";
+import ThemeToggle                        from "../ui/ThemeToggle";
 import { useTheme }                       from "../../context/ThemeContext";
 
+const NAV_LINKS = [
+  { to: "/",           label: "Home"       },
+  { to: "/components", label: "Components" },
+  { to: "/favorites",  label: "Favorites"  },
+];
+
 export default function Navbar() {
-  const { favorites }           = useFavorites();
-  const { isDark, toggleTheme } = useTheme();
+  const { favorites }  = useFavorites();
+  const { isDark }     = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [search,   setSearch]   = useState("");
-  const navigate                = useNavigate();
-  const location                = useLocation();
+  const navigate   = useNavigate();
+  const location   = useLocation();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => setScrolled(window.scrollY > 24);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -34,211 +39,255 @@ export default function Navbar() {
     }
   };
 
-  const navLinks = [
-    { to: "/",            label: "Home"       },
-    { to: "/components",  label: "Components" },
-    { to: "/favorites",   label: "Favorites"  },
-  ];
-
   const isActive = (to) =>
     to === "/" ? location.pathname === "/" : location.pathname.startsWith(to);
 
   return (
     <motion.nav
-      initial={{ y: -80 }}
+      initial={{ y: -72 }}
       animate={{ y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled ? "shadow-lg shadow-black/20" : ""
-      }`}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      className="sticky top-0 z-50"
       style={{
         background: scrolled
-          ? "var(--surface-glass-hover)"
-          : "var(--surface-glass)",
-        backdropFilter: "blur(20px)",
-        WebkitBackdropFilter: "blur(20px)",
-        borderBottom: "1px solid var(--ghost-border)",
+          ? "var(--nav-bg-solid)"
+          : "var(--nav-bg)",
+        backdropFilter: "blur(24px)",
+        WebkitBackdropFilter: "blur(24px)",
+        borderBottom: scrolled
+          ? "1px solid var(--border-soft)"
+          : "1px solid transparent",
+        transition: "background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease",
+        boxShadow: scrolled ? "0 1px 24px rgba(0,0,0,0.08)" : "none",
       }}
     >
-      <div className="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4">
+      <div className="max-w-[1320px] mx-auto px-5 h-16 flex items-center gap-4">
 
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2.5 font-bold text-xl shrink-0 group">
+        {/* ── Logo ── */}
+        <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
           <motion.div
-            whileHover={{ rotate: 90, scale: 1.1 }}
-            transition={{ duration: 0.4 }}
-            className="w-9 h-9 flex items-center justify-center"
+            whileHover={{ rotate: 180, scale: 1.1 }}
+            transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+            className="w-8 h-8 flex items-center justify-center"
+            style={{
+              background: "linear-gradient(135deg, var(--accent) 0%, var(--accent-dim) 100%)",
+              borderRadius: "10px",
+              boxShadow: "0 4px 16px rgba(99,102,241,0.25)",
+            }}
           >
-            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-              <defs>
-                <linearGradient id="blackui-nav" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#fed7aa" />
-                  <stop offset="30%" stopColor="#f472b6" />
-                  <stop offset="70%" stopColor="#a855f7" />
-                  <stop offset="100%" stopColor="#3b82f6" />
-                </linearGradient>
-              </defs>
-              <path d="M50 5 L89 27.5 L89 72.5 L50 95 L11 72.5 L11 27.5 Z" fill="url(#blackui-nav)" />
-              <path d="M48 50 L11 28 L11 72 Z" fill="var(--bg-primary)" opacity="0.8" />
-              <path d="M52 52 L89 72 L50 95 Z" fill="var(--bg-primary)" opacity="0.8" />
+            <svg viewBox="0 0 24 24" fill="none" width="16" height="16">
+              <path d="M12 2L20 7V17L12 22L4 17V7L12 2Z" fill="rgba(255,255,255,0.95)" />
+              <path d="M12 6L16 8.5V13.5L12 16L8 13.5V8.5L12 6Z" fill="rgba(255,255,255,0.45)" />
             </svg>
           </motion.div>
-          <span className="gradient-text font-extrabold tracking-tight">
+          <span className="font-extrabold text-lg tracking-tight"
+            style={{
+              fontFamily: "var(--font-display)",
+              background: "linear-gradient(135deg, var(--text-primary) 40%, var(--accent))",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+            }}>
             Black UI
           </span>
         </Link>
 
-        {/* Desktop Search */}
-        <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-sm">
+        {/* ── Desktop Search ── */}
+        <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xs">
           <div className="relative w-full group">
             <Search
-              size={15}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#767577] group-focus-within:text-indigo-400 transition-colors"
+              size={14}
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none transition-colors duration-200"
+              style={{ color: "var(--text-muted)" }}
             />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search components..."
-              className="input-dark w-full pl-10 pr-4 py-2 text-sm"
+              placeholder="Search components…"
+              className="w-full pl-10 pr-4 py-2 text-sm transition-all"
+              style={{
+                background: "var(--bg-elevated)",
+                border: "1px solid var(--border-soft)",
+                color: "var(--text-primary)",
+                borderRadius: "11px",
+                outline: "none",
+                fontFamily: "var(--font-body)",
+              }}
+              onFocus={(e) => {
+                e.target.style.borderColor = "var(--gold-border)";
+                e.target.style.boxShadow = "0 0 0 3px var(--gold-muted)";
+                e.target.style.background = "var(--bg-float)";
+              }}
+              onBlur={(e) => {
+                e.target.style.borderColor = "var(--border-soft)";
+                e.target.style.boxShadow = "none";
+                e.target.style.background = "var(--bg-elevated)";
+              }}
             />
           </div>
         </form>
 
         <div className="flex-1" />
 
-        {/* Desktop Nav */}
+        {/* ── Desktop Nav Links ── */}
         <div className="hidden md:flex items-center gap-1">
-          {navLinks.map((link) => (
+          {NAV_LINKS.map((link) => (
             <Link key={link.to} to={link.to}>
               <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative px-4 py-2 rounded-xl text-sm font-medium transition-all"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                className="relative px-4 py-2 text-sm font-medium transition-colors"
                 style={{
-                  color: isActive(link.to) ? "#a3a6ff" : (isDark ? "#adaaad" : "#4b5563"),
-                  background: isActive(link.to) ? "rgba(99, 102, 241, 0.1)" : "transparent",
+                  borderRadius: "10px",
+                  color: isActive(link.to) ? "var(--gold)" : "var(--text-secondary)",
+                  background: isActive(link.to) ? "var(--gold-muted)" : "transparent",
                   border: isActive(link.to)
-                    ? "1px solid rgba(99, 102, 241, 0.2)"
+                    ? "1px solid var(--gold-border)"
                     : "1px solid transparent",
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive(link.to)) {
+                    e.currentTarget.style.color = "var(--text-primary)";
+                    e.currentTarget.style.background = "var(--bg-elevated)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive(link.to)) {
+                    e.currentTarget.style.color = "var(--text-secondary)";
+                    e.currentTarget.style.background = "transparent";
+                  }
                 }}
               >
                 <span className="flex items-center gap-2">
                   {link.label}
                   {link.to === "/favorites" && favorites.length > 0 && (
-                    <span className="w-5 h-5 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                    <motion.span
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="w-4.5 h-4.5 text-[9px] font-bold rounded-full flex items-center justify-center"
+                      style={{
+                        background: "#F43F5E",
+                        color: "white",
+                        minWidth: "18px",
+                        height: "18px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        borderRadius: "50%",
+                        fontSize: "9px",
+                        fontWeight: 700,
+                      }}
+                    >
                       {favorites.length}
-                    </span>
+                    </motion.span>
                   )}
                 </span>
               </motion.div>
             </Link>
           ))}
-          
-          {/* Theme Toggle Button */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={toggleTheme}
-            className="ml-2 w-9 h-9 rounded-xl flex items-center justify-center transition-all"
-            style={{
-              background: "var(--surface-glass)",
-              border: "1px solid var(--ghost-border)",
-              color: "var(--text-primary)",
-            }}
-          >
-            {isDark ? <Sun size={16} /> : <Moon size={16} />}
-          </motion.button>
+
+          {/* Divider */}
+          <div className="w-px h-5 mx-1" style={{ background: "var(--border-soft)" }} />
+
+          <ThemeToggle />
         </div>
 
-        {/* Mobile Actions Container */}
+        {/* ── Mobile Actions ── */}
         <div className="md:hidden flex items-center gap-2">
-          {/* Mobile Theme Toggle Button */}
+          <ThemeToggle />
           <motion.button
-            whileTap={{ scale: 0.9 }}
-            onClick={toggleTheme}
-            className="w-9 h-9 rounded-xl flex items-center justify-center transition-all"
+            whileTap={{ scale: 0.92 }}
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="w-9 h-9 flex items-center justify-center"
             style={{
-              background: "var(--surface-glass)",
-              border: "1px solid var(--ghost-border)",
-              color: "var(--text-primary)",
+              background: "var(--bg-elevated)",
+              border: "1px solid var(--border-medium)",
+              borderRadius: "11px",
             }}
+            aria-label="Toggle menu"
           >
-            {isDark ? <Sun size={15} /> : <Moon size={15} />}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={menuOpen ? "x" : "menu"}
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 90, opacity: 0 }}
+                transition={{ duration: 0.15 }}
+              >
+                {menuOpen
+                  ? <X size={16} style={{ color: "var(--text-primary)" }} />
+                  : <Menu size={16} style={{ color: "var(--text-primary)" }} />
+                }
+              </motion.div>
+            </AnimatePresence>
           </motion.button>
-
-        {/* Mobile Menu Toggle */}
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden w-9 h-9 rounded-xl flex items-center justify-center"
-          style={{
-            background: "var(--surface-glass)",
-            border: "1px solid var(--ghost-border)",
-          }}
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={menuOpen ? "x" : "menu"}
-              initial={{ rotate: -90, opacity: 0 }}
-              animate={{ rotate: 0,   opacity: 1 }}
-              exit={{   rotate:  90,  opacity: 0 }}
-              transition={{ duration: 0.15 }}
-            >
-              {menuOpen
-                ? <X    size={16} color={isDark ? "#f9f5f8" : "#111827"} />
-                : <Menu size={16} color={isDark ? "#f9f5f8" : "#111827"} />
-              }
-            </motion.div>
-          </AnimatePresence>
-        </motion.button>
         </div>
       </div>
 
-      {/* Mobile Menu */}
+      {/* ── Mobile Menu ── */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
-            exit={{    height: 0,      opacity: 0 }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
             className="overflow-hidden md:hidden"
-            style={{
-              background: isDark ? "rgba(14, 14, 16, 0.95)" : "rgba(255, 255, 255, 0.95)",
-              borderTop: isDark ? "1px solid rgba(255,255,255,0.05)" : "1px solid rgba(0,0,0,0.05)",
-            }}
+            style={{ borderTop: "1px solid var(--border-subtle)" }}
           >
-            <div className="px-4 py-4 space-y-2">
-              <form onSubmit={handleSearch}>
+            <div className="px-5 py-4 space-y-2"
+              style={{ background: "rgba(10,10,11,0.96)" }}>
+
+              {/* Mobile search */}
+              <form onSubmit={handleSearch} className="mb-3">
                 <div className="relative">
-                  <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#767577]" />
+                  <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2"
+                    style={{ color: "var(--text-muted)" }} />
                   <input
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search components..."
-                    className="input-dark w-full pl-10 pr-4 py-2.5 text-sm"
+                    placeholder="Search components…"
+                    className="w-full pl-10 pr-4 py-2.5 text-sm"
+                    style={{
+                      background: "var(--bg-elevated)",
+                      border: "1px solid var(--border-soft)",
+                      color: "var(--text-primary)",
+                      borderRadius: "11px",
+                      outline: "none",
+                    }}
                   />
                 </div>
               </form>
-              {navLinks.map((link) => (
-                <Link
+
+              {NAV_LINKS.map((link, i) => (
+                <motion.div
                   key={link.to}
-                  to={link.to}
-                  className="flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all"
-                  style={{
-                    color: isActive(link.to) ? "#a3a6ff" : (isDark ? "#adaaad" : "#4b5563"),
-                    background: isActive(link.to) ? "rgba(99,102,241,0.08)" : "transparent",
-                  }}
+                  initial={{ opacity: 0, x: -12 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
                 >
-                  {link.label}
-                  {link.to === "/favorites" && favorites.length > 0 && (
-                    <span className="w-5 h-5 bg-rose-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
-                      {favorites.length}
-                    </span>
-                  )}
-                </Link>
+                  <Link
+                    to={link.to}
+                    className="flex items-center justify-between px-4 py-3 text-sm font-medium transition-all"
+                    style={{
+                      borderRadius: "11px",
+                      color: isActive(link.to) ? "var(--gold)" : "var(--text-secondary)",
+                      background: isActive(link.to) ? "var(--gold-muted)" : "transparent",
+                      border: isActive(link.to)
+                        ? "1px solid var(--gold-border)"
+                        : "1px solid transparent",
+                    }}
+                  >
+                    {link.label}
+                    {link.to === "/favorites" && favorites.length > 0 && (
+                      <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-full"
+                        style={{ background: "#F43F5E", color: "white" }}>
+                        {favorites.length}
+                      </span>
+                    )}
+                  </Link>
+                </motion.div>
               ))}
             </div>
           </motion.div>

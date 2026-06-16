@@ -90,7 +90,8 @@ dist
 
 # Gatsby files
 .cache/
-public
+# NOTE: do NOT ignore frontend/public (Vite static assets like favicon live there).
+/public
 
 # Vuepress build output
 .vuepress/dist
